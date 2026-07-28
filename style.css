@@ -2826,3 +2826,8 @@ CERTIFICATE
 .certificate-card .btn:hover{
     background:#a78bfa;
 }
+
+/* Logo tetap ungu saat Dark Mode */
+body.dark .logo{
+    color: #8B5CF6 !important;
+}
