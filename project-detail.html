@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#080E1C">
+    <meta name="description" content="Detail proyek portofolio Marcellino Setya Yuangga.">
+    <title>Detail Proyek | Marcellino</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="style.css?v=8">
+    <link rel="stylesheet" href="project-detail.css?v=8">
+    <script src="projects-data.js?v=8" defer></script>
+    <script src="project-detail.js?v=8" defer></script>
+</head>
+<body class="dark project-detail-body">
+    <header class="detail-header">
+        <nav class="navbar" aria-label="Navigasi detail proyek">
+            <a href="index.html#projects" class="logo" aria-label="Kembali ke portofolio">Marcell.</a>
+            <a href="index.html#projects" class="detail-back-link"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Kembali ke Proyek</a>
+        </nav>
+    </header>
+
+    <main class="detail-page">
+        <div class="detail-eyebrow"><span class="detail-pulse"></span> PORTFOLIO / PROJECT DETAIL</div>
+        <h1 id="projectTitle">Memuat proyek...</h1>
+        <p id="projectDescription" class="detail-lead">Sedang memuat informasi proyek.</p>
+
+        <div class="detail-grid">
+            <section class="detail-preview-card" aria-label="Pratinjau proyek">
+                <div class="preview-topbar" aria-hidden="true">
+                    <span></span><span></span><span></span>
+                    <small>PROJECT_PREVIEW.exe</small>
+                </div>
+                <div class="detail-cover-wrap" id="coverWrap">
+                    <img id="projectCover" alt="Pratinjau proyek" hidden>
+                    <div id="coverFallback" class="cover-fallback">
+                        <i class="fa-solid fa-code" aria-hidden="true"></i>
+                        <span>Preview gambar belum tersedia</span>
+                        <small>Pastikan folder <code>project/</code> ikut diunggah.</small>
+                    </div>
+                </div>
+                <section id="bmiBarcodePanel" class="barcode-panel" hidden aria-labelledby="barcodeTitle">
+                    <div class="barcode-heading">
+                        <span class="barcode-icon"><i class="fa-solid fa-qrcode" aria-hidden="true"></i></span>
+                        <div>
+                            <h2 id="barcodeTitle">BMI Project Barcode</h2>
+                            <p>Scan kode untuk membuka tujuan proyek BMI.</p>
+                        </div>
+                    </div>
+                    <div class="barcode-frame">
+                        <img id="bmiBarcodeImage" alt="Barcode QR untuk proyek BMI" hidden>
+                        <div id="barcodeLoading" class="barcode-loading"><span class="mini-spinner"></span> Menyiapkan barcode...</div>
+                        <div id="barcodeError" class="barcode-error" hidden>Barcode tidak dapat dimuat. Periksa koneksi internet atau tambahkan foto di <code>project/BMI-barcode.png</code>.</div>
+                    </div>
+                    <p id="barcodeNote" class="barcode-note">Barcode akan mengarah ke alamat proyek yang dikonfigurasi.</p>
+                    <a id="barcodeTargetLink" class="barcode-target" target="_blank" rel="noopener noreferrer" hidden><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> Buka tujuan barcode</a>
+                </section>
+            </section>
+
+            <section class="detail-info-card" aria-label="Informasi proyek">
+                <div class="detail-meta"><span class="meta-dot"></span><span id="projectCategory">PROJECT</span><span class="meta-divider">/</span><span id="projectNumber">01</span></div>
+                <h2>Ringkasan Proyek</h2>
+                <p id="projectSummary" class="detail-summary">Informasi proyek akan ditampilkan di sini.</p>
+                <div class="detail-tags" id="projectTags" aria-label="Teknologi proyek"></div>
+
+                <div class="detail-actions">
+                    <a id="openProjectWebsite" class="detail-primary-button" target="_blank" rel="noopener noreferrer" hidden>
+                        <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> Buka Website Proyek
+                    </a>
+                    <p id="projectLinkNote" class="link-note" role="status">Link website live belum ditambahkan. Halaman detail ini tetap bisa dibuka.</p>
+                    <a href="index.html#projects" class="detail-secondary-button"><i class="fa-solid fa-grid-2" aria-hidden="true"></i> Kembali ke Semua Proyek</a>
+                </div>
+
+                <div class="detail-code-note"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>Untuk membuka website proyek secara langsung, isi properti <code>url</code> proyek terkait di file <code>projects-data.js</code>.</span></div>
+            </section>
+        </div>
+
+        <p id="projectNotFound" class="not-found" hidden>Proyek tidak ditemukan. Silakan kembali ke <a href="index.html#projects">halaman portofolio</a>.</p>
+    </main>
+
+    <footer class="detail-footer">
+        <p>© <span id="currentYear">2026</span> Marcellino Setya Yuangga <span class="footer-separator">•</span> Built with HTML, CSS &amp; JavaScript</p>
+    </footer>
+</body>
+</html>
