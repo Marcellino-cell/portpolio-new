@@ -1,1255 +1,658 @@
-/*==========================================
-LOADING SCREEN
-==========================================*/
+/* =========================================================
+   MARCELLINO PORTFOLIO — STABLE + PERFORMANCE FRIENDLY
+   Smooth navigation | Projects | Certificates | Theme
+   Education / Experience dialog | Search | Responsive UI
+========================================================= */
+(() => {
+    "use strict";
 
-window.addEventListener("load", () => {
+    const $ = (selector, root = document) => root.querySelector(selector);
+    const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+    const body = document.body;
+    const header = $("header");
+    const navMenu = $("#navMenu");
+    const menuButton = $(".menu-btn");
+    const themeButton = $("#theme-toggle");
+    const progressBar = $("#progress-bar");
+    const topButton = $("#topBtn");
+    const projectGrid = $(".project-grid");
+    const projectSearch = $("#projectSearch");
+    const projectEmpty = $("#projectEmpty");
+    const toast = $("#toastNotification");
+    const popup = $("#educationPopup");
+    const popupImage = $("#popupImage");
+    const popupImageFallback = $("#popupImageFallback");
+    const popupFallbackTitle = $("#popupFallbackTitle");
+    const popupFallbackText = $("#popupFallbackText");
+    const popupTitle = $("#popupTitle");
+    const popupDescription = $("#popupDescription");
+    const popupTags = $("#popupTags");
+    const closePopupButton = $("#closeEducation");
+    const copyEmailButton = $("#copyEmail");
+    const currentYear = $("#currentYear");
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    const loader = document.getElementById("loader");
+    const projectCards = $$(".project-card");
+    const filterButtons = $$(".filter-btn");
+    const navLinks = $$('#navMenu a[href^="#"]');
+    const pageSections = $$("section[id]");
+    const projectData = Array.isArray(window.PORTFOLIO_PROJECTS)
+        ? window.PORTFOLIO_PROJECTS
+        : [];
 
-    loader.style.opacity = "0";
+    let toastTimer = 0;
+    let navigationFrame = 0;
+    let navigationTargetId = null;
+    let navigationTimer = 0;
+    let previousFocus = null;
+    let activeProjectFilter = "all";
+    let activeProjectSearch = "";
+    let activePopupData = null;
 
-    setTimeout(() => {
+    /* -------------------- LOADING SCREEN -------------------- */
+    const loader = $("#loader");
+    let loaderHidden = false;
 
-        loader.style.display = "none";
-
-    }, 500);
-
-});
-
-
-/*==========================================
-SCROLL PROGRESS BAR
-==========================================*/
-
-const progressBar = document.getElementById("progress-bar");
-
-window.addEventListener("scroll", () => {
-
-    const scrollTop = document.documentElement.scrollTop;
-
-    const height = document.documentElement.scrollHeight -
-                   document.documentElement.clientHeight;
-
-    const progress = (scrollTop / height) * 100;
-
-    progressBar.style.width = progress + "%";
-
-});
-
-
-/*==========================================
-STICKY NAVBAR
-==========================================*/
-
-const header = document.querySelector("header");
-
-window.addEventListener("scroll", () => {
-
-    if (window.scrollY > 40) {
-
-        header.style.boxShadow =
-        "0 10px 25px rgba(0,0,0,.08)";
-
-        header.style.background =
-        "rgba(255,255,255,.95)";
-
-    } else {
-
-        header.style.boxShadow = "none";
-
-        header.style.background =
-        "rgba(255,255,255,.9)";
-
+    function hideLoader() {
+        if (!loader || loaderHidden) return;
+        loaderHidden = true;
+        loader.classList.add("is-hidden");
+        window.setTimeout(() => {
+            loader.hidden = true;
+        }, reduceMotion ? 0 : 420);
     }
 
-});
-
-
-/*==========================================
-BACK TO TOP
-==========================================*/
-
-const topBtn = document.getElementById("topBtn");
-
-window.addEventListener("scroll", () => {
-
-    if (window.scrollY > 500) {
-
-        topBtn.style.display = "flex";
-
-        topBtn.style.alignItems = "center";
-
-        topBtn.style.justifyContent = "center";
-
-    } else {
-
-        topBtn.style.display = "none";
-
-    }
-
-});
-
-topBtn.addEventListener("click", () => {
-
-    window.scrollTo({
-
-        top:0,
-
-        behavior:"smooth"
-
-    });
-
-});
-
-
-/*==========================================
-HAMBURGER MENU
-==========================================*/
-
-const menuBtn = document.querySelector(".menu-btn");
-
-const navMenu = document.querySelector(".nav-menu");
-
-menuBtn.addEventListener("click", () => {
-
-    navMenu.classList.toggle("active");
-
-});
-
-
-/*==========================================
-AUTO CLOSE MENU
-==========================================*/
-
-document.querySelectorAll(".nav-menu a")
-
-.forEach(link => {
-
-    link.addEventListener("click", () => {
-
-        navMenu.classList.remove("active");
-
-    });
-
-});
-
-
-/*==========================================
-ACTIVE MENU
-==========================================*/
-
-const sections = document.querySelectorAll("section");
-
-const navLinks = document.querySelectorAll(".nav-menu a");
-
-window.addEventListener("scroll", () => {
-
-    let current = "";
-
-    sections.forEach(section => {
-
-        const sectionTop = section.offsetTop - 120;
-
-        const sectionHeight = section.clientHeight;
-
-        if (scrollY >= sectionTop) {
-
-            current = section.getAttribute("id");
-
-        }
-
-    });
-
-    navLinks.forEach(link => {
-
-        link.classList.remove("active");
-
-        if (
-
-            link.getAttribute("href") === "#" + current
-
-        ){
-
-            link.classList.add("active");
-
-        }
-
-    });
-
-});
-
-
-/*==========================================
-SMOOTH SCROLL
-==========================================*/
-
-document.querySelectorAll('a[href^="#"]')
-
-.forEach(anchor => {
-
-anchor.addEventListener("click", function(e){
-
-e.preventDefault();
-
-const target = document.querySelector(
-
-this.getAttribute("href")
-
-);
-
-if(target){
-
-target.scrollIntoView({
-
-behavior:"smooth"
-
-});
-
-}
-
-});
-
-});
-
-/*==========================================
-DARK MODE
-==========================================*/
-
-const themeButton = document.querySelector("#theme-toggle");
-const body = document.body;
-
-// cek tema sebelumnya
-const savedTheme = localStorage.getItem("theme");
-
-if(savedTheme === "dark"){
-
-    body.classList.add("dark");
-
-    themeButton.innerHTML =
-    '<i class="fa-solid fa-sun"></i>';
-
-}
-
-themeButton.addEventListener("click",()=>{
-
-    body.classList.toggle("dark");
-
-    if(body.classList.contains("dark")){
-
-        localStorage.setItem("theme","dark");
-
-        themeButton.innerHTML =
-        '<i class="fa-solid fa-sun"></i>';
-
-    }else{
-
-        localStorage.setItem("theme","light");
-
-        themeButton.innerHTML =
-        '<i class="fa-solid fa-moon"></i>';
-
-    }
-
-});
-
-
-/*==========================================
-TYPING EFFECT
-==========================================*/
-
-const typingText = document.getElementById("typing");
-
-const words = [
-
-"Frontend Developer",
-
-"UI / UX Designer",
-
-"Web Developer",
-
-"JavaScript Enthusiast"
-
-];
-
-let wordIndex = 0;
-let charIndex = 0;
-let deleting = false;
-
-function typingEffect(){
-
-    const currentWord = words[wordIndex];
-
-    if(!deleting){
-
-        typingText.textContent =
-        currentWord.substring(0,charIndex++);
-
-        if(charIndex > currentWord.length){
-
-            deleting = true;
-
-            setTimeout(typingEffect,1200);
-
+    window.addEventListener("load", hideLoader, { once: true });
+    // Don't leave the screen blocked if an optional asset stalls.
+    window.setTimeout(hideLoader, 1600);
+
+    /* -------------------- TOAST -------------------- */
+    function showToast(message) {
+        if (!toast) {
+            console.info(message);
             return;
-
         }
-
-    }else{
-
-        typingText.textContent =
-        currentWord.substring(0,charIndex--);
-
-        if(charIndex < 0){
-
-            deleting = false;
-
-            wordIndex++;
-
-            if(wordIndex >= words.length){
-
-                wordIndex = 0;
-
-            }
-
-        }
-
+        window.clearTimeout(toastTimer);
+        toast.textContent = message;
+        toast.classList.add("show");
+        toastTimer = window.setTimeout(() => toast.classList.remove("show"), 2800);
     }
 
-    setTimeout(
-
-        typingEffect,
-
-        deleting ? 45 : 110
-
-    );
-
-}
-
-typingEffect();
-
-/*==========================================
-SKILL ANIMATION
-==========================================*/
-
-const skillBars = document.querySelectorAll(".fill");
-
-const skillObserver = new IntersectionObserver(
-
-(entries)=>{
-
-entries.forEach(entry=>{
-
-if(entry.isIntersecting){
-
-entry.target.style.animation =
-"progress 2s ease forwards";
-
-skillObserver.unobserve(entry.target);
-
-}
-
-});
-
-},
-
-{
-
-threshold:.5
-
-}
-
-);
-
-skillBars.forEach(bar=>{
-
-bar.style.animation="none";
-
-skillObserver.observe(bar);
-
-});
-
-
-/*==========================================
-SCROLL REVEAL
-==========================================*/
-
-const reveals = document.querySelectorAll(
-
-".section-title,.about-container,.timeline-item,.skill-card,.project-card,.experience-box,#contact-form"
-
-);
-
-const revealObserver = new IntersectionObserver(
-
-(entries)=>{
-
-entries.forEach(entry=>{
-
-if(entry.isIntersecting){
-
-entry.target.classList.add("show");
-
-}
-
-});
-
-},
-
-{
-
-threshold:.15
-
-}
-
-);
-
-reveals.forEach(item=>{
-
-revealObserver.observe(item);
-
-});
-
-/*==========================================
-TOAST NOTIFICATION
-==========================================*/
-
-function showToast(message){
-
-    const toast = document.createElement("div");
-
-    toast.className = "toast";
-
-    toast.innerHTML = message;
-
-    document.body.appendChild(toast);
-
-    setTimeout(()=>{
-
-        toast.classList.add("show");
-
-    },100);
-
-    setTimeout(()=>{
-
-        toast.classList.remove("show");
-
-        setTimeout(()=>{
-
-            toast.remove();
-
-        },400);
-
-    },3000);
-
-}
-
-
-/*==========================================
-CONTACT FORM
-==========================================*/
-
-const contactForm = document.getElementById("contact-form");
-
-if(contactForm){
-
-contactForm.addEventListener("submit",(e)=>{
-
-e.preventDefault();
-
-showToast("✅ Pesan berhasil dikirim.");
-
-contactForm.reset();
-
-});
-
-}
-
-
-/*==========================================
-RIPPLE BUTTON
-==========================================*/
-
-document.querySelectorAll(
-
-".btn,.btn-small,.btn-outline,#contact-form button"
-
-).forEach(button=>{
-
-button.addEventListener("click",function(e){
-
-const ripple=document.createElement("span");
-
-const rect=this.getBoundingClientRect();
-
-const size=Math.max(rect.width,rect.height);
-
-ripple.style.width=size+"px";
-
-ripple.style.height=size+"px";
-
-ripple.style.left=(e.clientX-rect.left-size/2)+"px";
-
-ripple.style.top=(e.clientY-rect.top-size/2)+"px";
-
-ripple.classList.add("ripple");
-
-this.appendChild(ripple);
-
-setTimeout(()=>{
-
-ripple.remove();
-
-},600);
-
-});
-
-});
-
-
-/*==========================================
-CUSTOM CURSOR
-==========================================*/
-
-const cursor=document.createElement("div");
-
-cursor.className="cursor";
-
-document.body.appendChild(cursor);
-
-document.addEventListener("mousemove",(e)=>{
-
-cursor.style.left=e.clientX+"px";
-
-cursor.style.top=e.clientY+"px";
-
-});
-
-document.querySelectorAll("a,button").forEach(item=>{
-
-item.addEventListener("mouseenter",()=>{
-
-cursor.classList.add("active");
-
-});
-
-item.addEventListener("mouseleave",()=>{
-
-cursor.classList.remove("active");
-
-});
-
-});
-
-/*==========================================
-FLOATING SHAPES
-==========================================*/
-
-for(let i=0;i<15;i++){
-
-const shape=document.createElement("span");
-
-shape.className="shape";
-
-shape.style.left=Math.random()*100+"%";
-
-shape.style.animationDuration=
-
-5+Math.random()*8+"s";
-
-shape.style.animationDelay=
-
-Math.random()*5+"s";
-
-document.body.appendChild(shape);
-
-}
-
-
-/*==========================================
-CARD TILT EFFECT
-==========================================*/
-
-document.querySelectorAll(
-
-".project-card,.skill-card,.box"
-
-).forEach(card=>{
-
-card.addEventListener("mousemove",(e)=>{
-
-const rect=card.getBoundingClientRect();
-
-const x=e.clientX-rect.left;
-
-const y=e.clientY-rect.top;
-
-const rotateY=(x-rect.width/2)/18;
-
-const rotateX=-(y-rect.height/2)/18;
-
-card.style.transform=
-
-`perspective(1000px)
-
-rotateX(${rotateX}deg)
-
-rotateY(${rotateY}deg)
-
-scale(1.04)`;
-
-});
-
-card.addEventListener("mouseleave",()=>{
-
-card.style.transform="";
-
-});
-
-});
-
-
-/*==========================================
-COPY EMAIL
-==========================================*/
-
-const emailElement=document.querySelector(".copy-email");
-
-if(emailElement){
-
-emailElement.addEventListener("click",()=>{
-
-navigator.clipboard.writeText(
-
-"emailanda@gmail.com"
-
-);
-
-showToast("📧 Email berhasil disalin.");
-
-});
-
-}
-
-/*==========================================
-CONTACT VALIDATION
-==========================================*/
-
-const form = document.getElementById("contact-form");
-
-if(form){
-
-form.addEventListener("submit",(e)=>{
-
-e.preventDefault();
-
-const inputs=form.querySelectorAll("input,textarea");
-
-let valid=true;
-
-inputs.forEach(input=>{
-
-if(input.hasAttribute("required") && input.value.trim()===""){
-
-valid=false;
-
-input.style.border="2px solid red";
-
-}else{
-
-input.style.border="none";
-
-}
-
-});
-
-if(valid){
-
-showToast("✅ Pesan berhasil dikirim.");
-
-form.reset();
-
-}
-
-});
-
-}
-
-
-/*==========================================
-LAZY IMAGE
-==========================================*/
-
-const lazyImages=document.querySelectorAll("img");
-
-const imageObserver=new IntersectionObserver(
-
-(entries)=>{
-
-entries.forEach(entry=>{
-
-if(entry.isIntersecting){
-
-const img=entry.target;
-
-img.style.opacity="1";
-
-imageObserver.unobserve(img);
-
-}
-
-});
-
-});
-
-lazyImages.forEach(img=>{
-
-img.style.opacity="0";
-
-img.style.transition=".8s";
-
-imageObserver.observe(img);
-
-});
-
-
-/*==========================================
-TITLE ANIMATION
-==========================================*/
-
-const titles=document.querySelectorAll(".section-title h2");
-
-titles.forEach(title=>{
-
-title.addEventListener("mouseenter",()=>{
-
-title.style.transform="scale(1.05)";
-
-});
-
-title.addEventListener("mouseleave",()=>{
-
-title.style.transform="scale(1)";
-
-});
-
-});
-
-
-/*==========================================
-HERO IMAGE HOVER
-==========================================*/
-
-const hero=document.querySelector(".hero-right img");
-
-if(hero){
-
-hero.addEventListener("mouseenter",()=>{
-
-hero.style.transition=".4s";
-
-hero.style.transform="scale(1.05)";
-
-});
-
-hero.addEventListener("mouseleave",()=>{
-
-hero.style.transform="scale(1)";
-
-});
-
-}
-
-
-/*==========================================
-THROTTLE SCROLL
-==========================================*/
-
-function throttle(callback,delay){
-
-let wait=false;
-
-return function(){
-
-if(wait)return;
-
-callback.apply(this,arguments);
-
-wait=true;
-
-setTimeout(()=>{
-
-wait=false;
-
-},delay);
-
-};
-
-}
-
-window.addEventListener(
-
-"scroll",
-
-throttle(()=>{
-
-document.body.dataset.scroll=window.scrollY;
-
-},50)
-
-);
-
-
-/*==========================================
-SECTION ACTIVE EFFECT
-==========================================*/
-
-const allSections=document.querySelectorAll("section");
-
-const activeObserver=new IntersectionObserver(
-
-(entries)=>{
-
-entries.forEach(entry=>{
-
-if(entry.isIntersecting){
-
-entry.target.classList.add("section-active");
-
-}
-
-});
-
-},
-
-{
-
-threshold:.2
-
-}
-
-);
-
-allSections.forEach(section=>{
-
-activeObserver.observe(section);
-
-});
-
-
-/*==========================================
-KEYBOARD SHORTCUT
-==========================================*/
-
-document.addEventListener("keydown",(e)=>{
-
-if(e.key==="Home"){
-
-window.scrollTo({
-
-top:0,
-
-behavior:"smooth"
-
-});
-
-}
-
-});
-
-
-/*==========================================
-CONSOLE MESSAGE
-==========================================*/
-
-console.log("%cPortfolio Website","color:#8B5CF6;font-size:24px;font-weight:bold;");
-
-console.log("Created with HTML CSS JavaScript");
-
-
-/*==========================================
-FINISHED
-==========================================*/
-
-console.log("All Features Loaded Successfully.");
-
-/*==========================================
-SPOTLIGHT EFFECT
-==========================================*/
-
-const spotlight = document.getElementById("spotlight");
-
-if (spotlight) {
-    document.addEventListener("mousemove", (e) => {
-        spotlight.style.left = e.clientX + "px";
-        spotlight.style.top = e.clientY + "px";
+    /* -------------------- THEME -------------------- */
+    function readSavedTheme() {
+        try {
+            const value = localStorage.getItem("theme");
+            return value === "light" || value === "dark" ? value : "dark";
+        } catch (_error) {
+            return "dark";
+        }
+    }
+
+    function applyTheme(theme) {
+        const nextTheme = theme === "light" ? "light" : "dark";
+        const isDark = nextTheme === "dark";
+        body.classList.toggle("dark", isDark);
+        if (themeButton) {
+            themeButton.innerHTML = isDark
+                ? '<i class="fa-solid fa-sun" aria-hidden="true"></i>'
+                : '<i class="fa-solid fa-moon" aria-hidden="true"></i>';
+            themeButton.setAttribute("aria-label", isDark ? "Gunakan tema terang" : "Gunakan tema gelap");
+            themeButton.setAttribute("title", isDark ? "Gunakan tema terang" : "Gunakan tema gelap");
+        }
+        try {
+            localStorage.setItem("theme", nextTheme);
+        } catch (_error) {
+            // Theme switching still works for this page when storage is blocked.
+        }
+        const themeMeta = $('meta[name="theme-color"]');
+        if (themeMeta) themeMeta.content = isDark ? "#080E1C" : "#F5F7FB";
+    }
+
+    applyTheme(readSavedTheme());
+    themeButton?.addEventListener("click", () => {
+        applyTheme(body.classList.contains("dark") ? "light" : "dark");
     });
-}
 
-/*==========================================
-NETWORK BACKGROUND
-==========================================*/
-
-const canvas = document.getElementById("networkCanvas");
-
-if (canvas) {
-
-const ctx = canvas.getContext("2d");
-
-function resizeCanvas(){
-
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-}
-
-resizeCanvas();
-
-window.addEventListener("resize", resizeCanvas);
-
-const dots = [];
-
-for(let i=0;i<60;i++){
-
-dots.push({
-
-x:Math.random()*canvas.width,
-y:Math.random()*canvas.height,
-
-vx:(Math.random()-0.5)*0.5,
-vy:(Math.random()-0.5)*0.5
-
-});
-
-}
-
-function animate(){
-
-ctx.clearRect(0,0,canvas.width,canvas.height);
-
-dots.forEach(dot=>{
-
-dot.x+=dot.vx;
-dot.y+=dot.vy;
-
-if(dot.x<0||dot.x>canvas.width) dot.vx*=-1;
-if(dot.y<0||dot.y>canvas.height) dot.vy*=-1;
-
-ctx.beginPath();
-
-ctx.arc(dot.x,dot.y,2,0,Math.PI*2);
-
-ctx.fillStyle="#8B5CF6";
-
-ctx.fill();
-
-});
-
-for(let i=0;i<dots.length;i++){
-
-for(let j=i+1;j<dots.length;j++){
-
-const dx=dots[i].x-dots[j].x;
-const dy=dots[i].y-dots[j].y;
-
-const dist=Math.sqrt(dx*dx+dy*dy);
-
-if(dist<130){
-
-ctx.beginPath();
-
-ctx.moveTo(dots[i].x,dots[i].y);
-
-ctx.lineTo(dots[j].x,dots[j].y);
-
-ctx.strokeStyle=`rgba(139,92,246,${1-dist/130})`;
-
-ctx.stroke();
-
-}
-
-}
-
-}
-
-requestAnimationFrame(animate);
-
-}
-
-animate();
-
-}
-
-/*==========================================
-FLOATING ICONS PARALLAX
-==========================================*/
-
-const floatingIcons = document.querySelectorAll(".floating-icons i");
-
-window.addEventListener("mousemove",(e)=>{
-
-const x=(window.innerWidth/2-e.clientX)/80;
-
-const y=(window.innerHeight/2-e.clientY)/80;
-
-floatingIcons.forEach(icon=>{
-
-icon.style.transform=`translate(${x}px,${y}px)`;
-
-});
-
-});
-
-/*==========================================
-PROJECT HOVER
-==========================================*/
-
-document.querySelectorAll(".project-card")
-
-.forEach(card=>{
-
-card.addEventListener("mouseenter",()=>{
-
-card.style.transition=".4s";
-
-card.style.boxShadow=
-
-"0 25px 60px rgba(139,92,246,.35)";
-
-});
-
-card.addEventListener("mouseleave",()=>{
-
-card.style.boxShadow="";
-
-});
-
-});
-
-/*==========================================
-SECTION ANIMATION
-==========================================*/
-
-const premiumSections=document.querySelectorAll("section");
-
-const premiumObserver=new IntersectionObserver(
-
-(entries)=>{
-
-entries.forEach(entry=>{
-
-if(entry.isIntersecting){
-
-entry.target.animate([
-
-{
-
-opacity:0,
-
-transform:"translateY(60px)"
-
-},
-
-{
-
-opacity:1,
-
-transform:"translateY(0)"
-
-}
-
-],{
-
-duration:900,
-
-fill:"forwards",
-
-easing:"ease"
-
-});
-
-}
-
-});
-
-});
-
-premiumSections.forEach(section=>{
-
-premiumObserver.observe(section);
-
-});
-
-/*==========================================
-NEON HOVER
-==========================================*/
-
-const neon=document.querySelector(".neon-name");
-
-if(neon){
-
-neon.addEventListener("mouseenter",()=>{
-
-neon.style.transform="scale(1.05)";
-
-});
-
-neon.addEventListener("mouseleave",()=>{
-
-neon.style.transform="scale(1)";
-
-});
-
-}
-
-/*==========================================
-PREMIUM VERSION
-==========================================*/
-
-console.log("%cPortfolio Premium v3",
-"color:#8B5CF6;font-size:22px;font-weight:bold;");
-
-console.log("Created by Marcellino with HTML CSS JavaScript");
-
-/*==========================================
-EDUCATION POPUP
-==========================================*/
-
-const educationData = [
-{
-title:"SMK Krian 1 Sidoarjo",
-image:"foto/smk.jpg",
-description:"SMK Krian 1 Sidoarjo merupakan sekolah kejuruan yang memiliki berbagai program keahlian, salah satunya Rekayasa Perangkat Lunak (RPL). Di sekolah ini saya mempelajari HTML, CSS, JavaScript, PHP, MySQL, pembuatan website, UI/UX, serta berbagai proyek berbasis web."
-},
-
-{
-title:"SMP Negeri 1 Prambon",
-image:"foto/smp.jpg",
-description:"Selama bersekolah di SMP Negeri 1 Prambon saya mulai mengenal dunia komputer dan teknologi. Dari sinilah muncul minat saya untuk menjadi seorang programmer dan melanjutkan pendidikan ke jurusan Rekayasa Perangkat Lunak."
-},
-
-{
-title:"SD Negeri Kedung Wonokerto",
-image:"foto/sd.jpeg",
-description:"Di SD Negeri Kedung Wonokerto saya mulai tertarik dengan teknologi dan komputer. Ketertarikan tersebut menjadi awal perjalanan saya untuk belajar di bidang IT hingga sekarang."
-}
-];
-
-const timelineItems = document.querySelectorAll(".timeline-item");
-
-const popup = document.getElementById("educationPopup");
-const popupImage = document.getElementById("popupImage");
-const popupTitle = document.getElementById("popupTitle");
-const popupDescription = document.getElementById("popupDescription");
-const closePopup = document.getElementById("closeEducation");
-
-timelineItems.forEach((item,index)=>{
-
-item.style.cursor="pointer";
-
-item.addEventListener("click",()=>{
-
-popup.classList.add("active");
-
-popupImage.src = educationData[index].image;
-popupTitle.innerText = educationData[index].title;
-popupDescription.innerText = educationData[index].description;
-
-});
-
-});
-
-closePopup.addEventListener("click",()=>{
-
-popup.classList.remove("active");
-
-});
-
-popup.addEventListener("click",(e)=>{
-
-if(e.target===popup){
-
-popup.classList.remove("active");
-
-}
-
-});
-
-/*==========================================
-EXPERIENCE POPUP
-==========================================*/
-
-const experienceCard = document.getElementById("experienceCard");
-
-experienceCard.addEventListener("click", () => {
-
-    popup.classList.add("active");
-
-    popupImage.src = "foto/cnc.png"; // ganti sesuai nama file
-
-    popupTitle.innerText = "PT CNC Disain Nusantara";
-
-    popupDescription.innerText =
-    "PT CNC Disain Nusantara merupakan perusahaan yang bergerak di bidang Industrial Automation dan Authorized Solution Partner Siemens. Selama PKL saya mengerjakan pembuatan Website Responsive, Landing Page, Dashboard, UI Modern, serta membantu berbagai pekerjaan berbasis web dan teknologi industri.";
-
-});
-
-/*==========================================
-MOUSE GLASS EFFECT
-==========================================*/
-
-const premiumCards = document.querySelectorAll(
-".timeline-item,.skill-card,.project-card,.experience-box,.contact-box"
-);
-
-premiumCards.forEach(card=>{
-
-card.addEventListener("mousemove",(e)=>{
-
-const rect = card.getBoundingClientRect();
-
-const x = e.clientX - rect.left;
-const y = e.clientY - rect.top;
-
-card.style.setProperty("--x",x+"px");
-card.style.setProperty("--y",y+"px");
-
-});
-
-});
-
-const projectData = [
-{
-    title: "Website Portfolio",
-    image: "project/portopolio.jpeg",
-    description: "Website portfolio modern yang dibuat menggunakan HTML, CSS, dan JavaScript."
-},
-{
-    title: "Web Report Industri",
-    image: "project/web industri.jpg",
-    description: "Website Before & After Service untuk mendokumentasikan kondisi mesin."
-},
-{
-    title: "Desain Grafis Industri",
-    image: "project/Desain Grafis.jpg",
-    description: "Desain grafis untuk kebutuhan promosi dan branding perusahaan."
-}
-];
-
-const projectCards = document.querySelectorAll(".project-card");
-
-projectCards.forEach((card,index)=>{
-
-    card.style.cursor = "pointer";
-
-    card.addEventListener("click",()=>{
+    /* -------------------- MOBILE NAVIGATION -------------------- */
+    function closeMobileMenu() {
+        if (!navMenu || !menuButton) return;
+        navMenu.classList.remove("active");
+        menuButton.setAttribute("aria-expanded", "false");
+        menuButton.setAttribute("aria-label", "Buka menu");
+        const icon = $("i", menuButton);
+        if (icon) icon.className = "fa-solid fa-bars";
+    }
+
+    menuButton?.addEventListener("click", () => {
+        if (!navMenu) return;
+        const opened = navMenu.classList.toggle("active");
+        menuButton.setAttribute("aria-expanded", String(opened));
+        menuButton.setAttribute("aria-label", opened ? "Tutup menu" : "Buka menu");
+        const icon = $("i", menuButton);
+        if (icon) icon.className = opened ? "fa-solid fa-xmark" : "fa-solid fa-bars";
+    });
+
+    document.addEventListener("click", event => {
+        if (!navMenu || !menuButton || !navMenu.classList.contains("active")) return;
+        const target = event.target;
+        if (!(target instanceof Node)) return;
+        if (!navMenu.contains(target) && !menuButton.contains(target)) closeMobileMenu();
+    });
+
+    window.addEventListener("resize", () => {
+        if (window.innerWidth > 900) closeMobileMenu();
+    }, { passive: true });
+
+    /* -------------------- THROTTLED SCROLL UI -------------------- */
+    function setActiveNav(sectionId) {
+        navLinks.forEach(link => {
+            const active = link.getAttribute("href") === `#${sectionId}`;
+            link.classList.toggle("active", active);
+            if (active) link.setAttribute("aria-current", "location");
+            else link.removeAttribute("aria-current");
+        });
+    }
+
+    function updateScrollUI() {
+        navigationFrame = 0;
+        const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        const percentage = maxScroll > 0 ? Math.min(100, Math.max(0, scrollY / maxScroll * 100)) : 0;
+
+        if (progressBar) progressBar.style.width = `${percentage}%`;
+        if (header) header.classList.toggle("scrolled", scrollY > 24);
+        if (topButton) topButton.style.display = scrollY > 520 ? "inline-flex" : "none";
+
+        if (pageSections.length) {
+            const marker = (header?.getBoundingClientRect().height || 0) + 110;
+            let current = pageSections[0];
+            for (const section of pageSections) {
+                if (section.getBoundingClientRect().top <= marker) current = section;
+            }
+            if (window.innerHeight + scrollY >= document.documentElement.scrollHeight - 4) {
+                current = pageSections[pageSections.length - 1];
+            }
+            const lockedTarget = navigationTargetId ? document.getElementById(navigationTargetId) : null;
+            if (lockedTarget) {
+                const targetTop = lockedTarget.getBoundingClientRect().top;
+                const desiredTop = (header?.getBoundingClientRect().height || 0) + 6;
+                setActiveNav(navigationTargetId);
+                pageSections.forEach(section => section.classList.toggle("section-active", section === lockedTarget));
+                if (Math.abs(targetTop - desiredTop) <= 28) clearNavigationLock();
+            } else {
+                setActiveNav(current.id);
+                pageSections.forEach(section => section.classList.toggle("section-active", section === current));
+            }
+        }
+    }
+
+    function requestScrollUI() {
+        if (navigationFrame) return;
+        navigationFrame = window.requestAnimationFrame(updateScrollUI);
+    }
+
+    window.addEventListener("scroll", requestScrollUI, { passive: true });
+    window.addEventListener("resize", requestScrollUI, { passive: true });
+    window.addEventListener("load", requestScrollUI, { once: true });
+
+    function clearNavigationLock() {
+        navigationTargetId = null;
+        if (navigationTimer) window.clearTimeout(navigationTimer);
+        navigationTimer = 0;
+    }
+
+    function scrollToSection(id) {
+        const target = document.getElementById(id);
+        if (!target) return false;
+        closeMobileMenu();
+        const offset = header?.getBoundingClientRect().height || 0;
+        const top = window.scrollY + target.getBoundingClientRect().top - offset - 6;
+        clearNavigationLock();
+        navigationTargetId = id;
+        setActiveNav(id);
+        window.scrollTo({ top: Math.max(0, top), behavior: reduceMotion ? "auto" : "smooth" });
+        if (reduceMotion) {
+            clearNavigationLock();
+        } else {
+            // Fallback for browsers that do not fire scrollend consistently.
+            navigationTimer = window.setTimeout(() => {
+                clearNavigationLock();
+                requestScrollUI();
+            }, 1900);
+        }
+        return true;
+    }
+
+    $$('a[href^="#"]').forEach(link => {
+        link.addEventListener("click", event => {
+            const href = link.getAttribute("href");
+            if (!href || href === "#") {
+                event.preventDefault();
+                return;
+            }
+            const targetId = href.slice(1);
+            if (!document.getElementById(targetId)) return;
+            event.preventDefault();
+            scrollToSection(targetId);
+        });
+    });
+
+    topButton?.addEventListener("click", () => {
+        clearNavigationLock();
+        window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+        setActiveNav("home");
+    });
+
+    /* -------------------- HERO ROLE LABEL -------------------- */
+    // A stable role label avoids an always-running timer and keeps the page responsive.
+    const typingElement = $("#typing");
+    if (typingElement) typingElement.textContent = "Frontend Developer";
+
+    /* -------------------- PROJECT SEARCH + FILTER -------------------- */
+    function normalizeText(value) {
+        return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+    }
+
+    function filterProjects() {
+        let visibleCount = 0;
+        projectCards.forEach((card, position) => {
+            const button = $(".project-btn", card);
+            const slug = button?.dataset.projectSlug || "";
+            const dataIndex = Number(button?.dataset.index ?? card.dataset.index ?? position);
+            const data = projectData.find(project => project.slug === slug) || projectData.find(project => Number(project.index) === dataIndex);
+            const category = card.dataset.category || data?.category || "all";
+            const title = $("h3", card)?.textContent || "";
+            const description = $("p", card)?.textContent || "";
+            const tags = Array.isArray(data?.tags) ? data.tags.join(" ") : "";
+            const matchingCategory = activeProjectFilter === "all" || category === activeProjectFilter;
+            const matchingText = normalizeText(`${title} ${description} ${tags}`).includes(activeProjectSearch);
+            const visible = matchingCategory && matchingText;
+            card.hidden = !visible;
+            if (visible) visibleCount += 1;
+        });
+        if (projectEmpty) projectEmpty.hidden = visibleCount !== 0;
+        if (projectGrid) projectGrid.classList.toggle("project-grid-empty", visibleCount === 0);
+    }
+
+    filterButtons.forEach(button => {
+        button.addEventListener("click", () => {
+            activeProjectFilter = button.dataset.filter || "all";
+            filterButtons.forEach(item => {
+                const active = item === button;
+                item.classList.toggle("active", active);
+                item.setAttribute("aria-pressed", String(active));
+            });
+            filterProjects();
+        });
+    });
+
+    projectSearch?.addEventListener("input", () => {
+        activeProjectSearch = normalizeText(projectSearch.value);
+        filterProjects();
+    });
+
+    /* Route project cards to their live website when configured. Otherwise use the local detail page. */
+    function resolveProjectUrl(project) {
+        const candidate = String(project?.url || "").trim();
+        if (!candidate || candidate === "#") return "";
+        try {
+            const parsed = new URL(candidate, window.location.href);
+            if (!["http:", "https:", "file:"].includes(parsed.protocol)) return "";
+            return candidate;
+        } catch (_error) {
+            return "";
+        }
+    }
+
+    projectCards.forEach((card, position) => {
+        const detailLink = $(".project-btn", card);
+        if (!detailLink) return;
+        const slug = detailLink.dataset.projectSlug || "";
+        const index = Number(detailLink.dataset.index ?? card.dataset.index ?? position);
+        const project = projectData.find(item => item.slug === slug) || projectData.find(item => Number(item.index) === index);
+        if (!project) {
+            detailLink.href = `project-detail.html?project=${encodeURIComponent(slug)}`;
+            return;
+        }
+
+        const liveUrl = resolveProjectUrl(project);
+        const isBmi = project.slug === "bmi-health-tracker";
+        if (liveUrl && !isBmi) {
+            detailLink.href = liveUrl;
+            detailLink.removeAttribute("data-local-detail");
+            try {
+                const parsed = new URL(liveUrl, window.location.href);
+                const external = parsed.origin !== window.location.origin;
+                if (external) {
+                    detailLink.target = "_blank";
+                    detailLink.rel = "noopener noreferrer";
+                } else {
+                    detailLink.removeAttribute("target");
+                }
+            } catch (_error) {
+                detailLink.removeAttribute("target");
+            }
+            detailLink.setAttribute("aria-label", `Buka website ${project.title}`);
+        } else {
+            detailLink.href = `project-detail.html?project=${encodeURIComponent(project.slug)}`;
+            detailLink.dataset.localDetail = "true";
+            detailLink.removeAttribute("target");
+            detailLink.setAttribute("aria-label", isBmi ? "Lihat detail dan barcode BMI Health Tracker" : `Lihat detail ${project.title}`);
+        }
+
+        card.addEventListener("click", event => {
+            if (event.target instanceof Element && event.target.closest("a, button, input, label")) return;
+            if (detailLink.href) window.location.assign(detailLink.href);
+        });
+    });
+    filterProjects();
+
+    /* -------------------- SHARED DETAIL POPUP -------------------- */
+    function setPopupFallback(data, message) {
+        if (popupImage) {
+            popupImage.hidden = true;
+            popupImage.removeAttribute("src");
+        }
+        if (popupImageFallback) popupImageFallback.hidden = false;
+        if (popupFallbackTitle) popupFallbackTitle.textContent = data.fallbackTitle || "Pratinjau dokumen belum tersedia";
+        if (popupFallbackText) popupFallbackText.textContent = message || data.fallbackText || "Tambahkan foto/scan asli pada folder aset agar tampil di bagian ini.";
+    }
+
+    function openPopup(data) {
+        if (!popup || !data) return;
+        previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+        activePopupData = data;
+
+        if (popupTitle) popupTitle.textContent = data.title || "Detail";
+        if (popupDescription) popupDescription.textContent = data.description || "Belum ada deskripsi.";
+        if (popupTags) {
+            popupTags.replaceChildren();
+            (Array.isArray(data.tags) ? data.tags : []).forEach(label => {
+                const tag = document.createElement("span");
+                tag.className = "popup-tag";
+                tag.textContent = String(label);
+                popupTags.appendChild(tag);
+            });
+        }
+
+        if (data.image && popupImage) {
+            if (popupImageFallback) popupImageFallback.hidden = true;
+            popupImage.hidden = true;
+            popupImage.onload = () => {
+                if (activePopupData !== data) return;
+                popupImage.hidden = false;
+                if (popupImageFallback) popupImageFallback.hidden = true;
+            };
+            popupImage.onerror = () => {
+                if (activePopupData !== data) return;
+                setPopupFallback(data);
+            };
+            popupImage.alt = `${data.title || "Dokumen"} — pratinjau`;
+            popupImage.src = data.image;
+            if (popupImage.complete && popupImage.naturalWidth > 0) {
+                popupImage.hidden = false;
+                if (popupImageFallback) popupImageFallback.hidden = true;
+            } else if (popupImage.complete && popupImage.naturalWidth === 0) {
+                setPopupFallback(data);
+            }
+        } else {
+            setPopupFallback(data);
+        }
 
         popup.classList.add("active");
+        popup.setAttribute("aria-hidden", "false");
+        body.classList.add("popup-open");
+        closePopupButton?.focus({ preventScroll: true });
+    }
 
-        popupImage.src = projectData[index].image;
-        popupTitle.innerText = projectData[index].title;
-        popupDescription.innerText = projectData[index].description;
+    function closePopup() {
+        if (!popup) return;
+        popup.classList.remove("active");
+        popup.setAttribute("aria-hidden", "true");
+        body.classList.remove("popup-open");
+        activePopupData = null;
+        if (popupImage) {
+            popupImage.onload = null;
+            popupImage.onerror = null;
+        }
+        if (previousFocus?.isConnected) previousFocus.focus({ preventScroll: true });
+    }
 
+    closePopupButton?.addEventListener("click", closePopup);
+    popup?.addEventListener("click", event => {
+        if (event.target === popup) closePopup();
+    });
+    document.addEventListener("keydown", event => {
+        const popupIsOpen = Boolean(popup?.classList.contains("active"));
+        if (event.key === "Escape") {
+            if (popupIsOpen) closePopup();
+            else if (navMenu?.classList.contains("active")) {
+                closeMobileMenu();
+                menuButton?.focus({ preventScroll: true });
+            }
+            return;
+        }
+        if (event.key === "Tab" && popupIsOpen && popup) {
+            const focusable = Array.from(popup.querySelectorAll('button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'))
+                .filter(element => !element.hidden && element.getClientRects().length > 0);
+            if (!focusable.length) {
+                event.preventDefault();
+                popup.focus?.({ preventScroll: true });
+                return;
+            }
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            if (event.shiftKey && (document.activeElement === first || !popup.contains(document.activeElement))) {
+                event.preventDefault();
+                last.focus({ preventScroll: true });
+            } else if (!event.shiftKey && (document.activeElement === last || !popup.contains(document.activeElement))) {
+                event.preventDefault();
+                first.focus({ preventScroll: true });
+            }
+        }
     });
 
-});
+    const educationDetails = [
+        {
+            title: "SMK Krian Sidoarjo",
+            image: "foto/smk.jpg",
+            tags: ["2024–2027", "Rekayasa Perangkat Lunak"],
+            description: "Saya menempuh pendidikan di SMK Krian Sidoarjo pada jurusan Rekayasa Perangkat Lunak. Saya mempelajari pemrograman, pengembangan website, basis data, dan teknologi digital.",
+            fallbackTitle: "Foto dokumentasi sekolah belum tersedia",
+            fallbackText: "Tambahkan foto sekolah di foto/smk.jpg untuk menampilkannya pada jendela ini."
+        },
+        {
+            title: "SMP Negeri 1 Prambon",
+            image: "foto/smp.jpg",
+            tags: ["2021–2024"],
+            description: "Di SMP Negeri 1 Prambon, saya mulai mengembangkan minat belajar dan ketertarikan pada komputer serta teknologi.",
+            fallbackTitle: "Foto dokumentasi sekolah belum tersedia",
+            fallbackText: "Tambahkan foto sekolah di foto/smp.jpg untuk menampilkannya pada jendela ini."
+        },
+        {
+            title: "SD Negeri Kedung Wonokerto",
+            image: "foto/sd.jpeg",
+            tags: ["2015–2021"],
+            description: "Pendidikan dasar menjadi awal perjalanan belajar dan mengembangkan pengetahuan yang terus berlanjut.",
+            fallbackTitle: "Foto dokumentasi sekolah belum tersedia",
+            fallbackText: "Tambahkan foto sekolah di foto/sd.jpeg untuk menampilkannya pada jendela ini."
+        }
+    ];
 
+    $$(".timeline-item[data-education]").forEach(item => {
+        const openEducation = () => {
+            const detail = educationDetails[Number(item.dataset.education)];
+            if (detail) openPopup(detail);
+        };
+        item.addEventListener("click", openEducation);
+        item.addEventListener("keydown", event => {
+            if (event.target !== item) return;
+            if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                openEducation();
+            }
+        });
+    });
+
+    const experienceDetail = {
+        title: "PT CNC Disain Nusantara",
+        image: "foto/cnc.png",
+        tags: ["Praktik Kerja Lapangan", "Web Development", "Motor Servo", "Graphic Design", "Simulator CNC"],
+        description: "PT CNC Disain Nusantara bergerak di bidang Motion Control dan Industrial Automation serta merupakan Authorized Solution Partner Siemens.\n\nSelama PKL, saya memperoleh pengalaman dalam service motor servo, pengembangan Web Report Before & After Service, pembuatan desain grafis, serta perakitan simulator CNC. Pengalaman tersebut membantu meningkatkan kemampuan teknis, pemrograman, kerja sama tim, dan pemecahan masalah.",
+        fallbackTitle: "Foto dokumentasi PKL belum tersedia",
+        fallbackText: "Tambahkan foto dokumentasi PKL di foto/cnc.png untuk menampilkannya pada jendela ini."
+    };
+
+    const experienceCard = $("#experienceCard");
+    const experienceDetailButton = $("#experienceDetailBtn");
+    experienceCard?.addEventListener("click", event => {
+        if (event.target instanceof Element && event.target.closest("button")) return;
+        openPopup(experienceDetail);
+    });
+    experienceCard?.addEventListener("keydown", event => {
+        if (event.target !== experienceCard) return;
+        if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            openPopup(experienceDetail);
+        }
+    });
+    experienceDetailButton?.addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
+        openPopup(experienceDetail);
+    });
+
+    /* -------------------- CERTIFICATE DETAILS -------------------- */
+    const certificateDetails = [
+        {
+            title: "Sertifikat Praktik Kerja Lapangan",
+            image: "sertifikat/sertifikat-pkl.jpg",
+            tags: ["PKL", "PT CNC Disain Nusantara", "Pengalaman industri"],
+            description: "Kegiatan Praktik Kerja Lapangan di PT CNC Disain Nusantara (Surabaya Office). Pengalaman ini membantu saya mengenal lingkungan kerja dan menerapkan kemampuan teknis secara langsung.",
+            fallbackTitle: "Foto sertifikat PKL belum dilampirkan",
+            fallbackText: "Simpan foto/scan asli dengan nama sertifikat-pkl.jpg di folder sertifikat/ agar dokumennya dapat dilihat di sini."
+        },
+        {
+            title: "Kunjungan Industri",
+            image: "sertifikat/kunjungan-industri.jpg",
+            tags: ["Kunjungan industri", "Garudafood", "Aice"],
+            description: "Dokumentasi pengalaman kunjungan industri ke PT Garudafood Putra Putri Jaya, Tbk dan PT Aice Ice Cream Jatim Industry untuk mengenal lingkungan kerja dan proses industri.",
+            fallbackTitle: "Dokumentasi kunjungan industri belum dilampirkan",
+            fallbackText: "Simpan foto/scan dokumen dengan nama kunjungan-industri.jpg di folder sertifikat/ untuk menampilkannya di sini."
+        },
+        {
+            title: "Jujitsu PORKAB — Juara 3",
+            image: "sertifikat/jujitsu-porkab.jpg",
+            tags: ["Jujitsu", "PORKAB", "Juara 3"],
+            description: "Pencapaian olahraga Jujitsu di PORKAB. Prestasi ini menjadi pengingat akan pentingnya disiplin, latihan, konsistensi, dan semangat untuk terus berkembang.",
+            fallbackTitle: "Foto sertifikat/penghargaan belum dilampirkan",
+            fallbackText: "Simpan foto/scan asli dengan nama jujitsu-porkab.jpg di folder sertifikat/ agar dokumennya dapat dilihat di sini."
+        }
+    ];
+
+    $$("[data-certificate]").forEach(button => {
+        button.addEventListener("click", () => {
+            const data = certificateDetails[Number(button.dataset.certificate)];
+            if (data) openPopup(data);
+        });
+    });
+
+    /* -------------------- COPY EMAIL -------------------- */
+    const emailToCopy = "fahrifajar379@gmail.com";
+    async function copyEmail() {
+        try {
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(emailToCopy);
+            } else {
+                const input = document.createElement("textarea");
+                input.value = emailToCopy;
+                input.setAttribute("readonly", "");
+                input.style.position = "fixed";
+                input.style.opacity = "0";
+                body.appendChild(input);
+                input.select();
+                const success = document.execCommand("copy");
+                input.remove();
+                if (!success) throw new Error("Clipboard tidak tersedia");
+            }
+            showToast("Alamat email berhasil disalin.");
+        } catch (_error) {
+            showToast(`Email: ${emailToCopy}`);
+        }
+    }
+    copyEmailButton?.addEventListener("click", copyEmail);
+
+    /* -------------------- LOW-COST REVEAL + SKILL BARS -------------------- */
+    if (!reduceMotion && "IntersectionObserver" in window) {
+        const revealItems = $$(".section-title, .about-container, .timeline-item, .skill-card, .project-card, .certificate-card, .experience-box, .contact-box");
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("is-visible");
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.08, rootMargin: "0px 0px -24px 0px" });
+
+        revealItems.forEach(item => {
+            item.classList.add("reveal-ready");
+            revealObserver.observe(item);
+        });
+
+        const skillObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                entry.target.classList.add("is-filled");
+                observer.unobserve(entry.target);
+            });
+        }, { threshold: 0.35 });
+        $$(".fill").forEach(bar => skillObserver.observe(bar));
+    } else {
+        $$(".fill").forEach(bar => bar.classList.add("is-filled"));
+    }
+
+    /* -------------------- MISSING IMAGE FALLBACKS -------------------- */
+    function insertImageFallback(image) {
+        if (!image || image.id === "popupImage" || image.dataset.fallbackAdded === "true") return;
+        const parent = image.parentElement;
+        if (!parent) return;
+        image.dataset.fallbackAdded = "true";
+        image.hidden = true;
+
+        const fallback = document.createElement("div");
+        fallback.className = "media-fallback";
+        const context = parent.classList.contains("hero-photo") ? "hero"
+            : parent.classList.contains("about-image") ? "about"
+            : parent.classList.contains("project-card") ? "project"
+            : parent.classList.contains("contact-photo") ? "contact" : "generic";
+        fallback.classList.add(`media-fallback--${context}`);
+        fallback.setAttribute("role", "img");
+        fallback.setAttribute("aria-label", `${image.alt || "Gambar"} belum tersedia`);
+
+        const mark = document.createElement("span");
+        mark.className = "media-fallback-mark";
+        mark.textContent = context === "project" ? "{ }" : context === "hero" || context === "about" ? "</>" : "IMG";
+        const title = document.createElement("p");
+        title.className = "media-fallback-title";
+        title.textContent = context === "project"
+            ? ($("h3", parent)?.textContent || image.alt || "Pratinjau proyek")
+            : (image.alt || "Gambar portofolio");
+        const caption = document.createElement("p");
+        caption.className = "media-fallback-caption";
+        caption.textContent = "MEDIA BELUM DITAMBAHKAN";
+        fallback.append(mark, title, caption);
+        image.insertAdjacentElement("beforebegin", fallback);
+    }
+
+    $$("img").forEach(image => {
+        image.addEventListener("error", () => insertImageFallback(image), { once: true });
+        if (image.complete && image.currentSrc && image.naturalWidth === 0) insertImageFallback(image);
+    });
+
+    /* -------------------- FOOTER YEAR -------------------- */
+    if (currentYear) currentYear.textContent = String(new Date().getFullYear());
+
+    // Initialise positions and controls without a repeated animation loop.
+    requestScrollUI();
+    console.info("Portfolio initialised: navigation, projects, certificates and dialogs ready.");
+})();
